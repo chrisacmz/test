@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Practice - Fixed</title>
+    <style>
+        :root { --p: #4f46e5; --s: #22c55e; --e: #ef4444; --bg: #f1f5f9; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); width: 100%; max-width: 500px; box-sizing: border-box; }
+        .quiz-card { background: #fff; padding: 1.5rem; border: 2px solid #e2e8f0; border-radius: 1rem; margin: 1rem 0; text-align: center; min-height: 80px; display: flex; align-items: center; justify-content: center; }
+        .options-grid { display: grid; gap: 10px; }
+        button { padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; cursor: pointer; transition: 0.2s; font-weight: 600; font-size: 1rem; background: white; }
+        button:hover:not(:disabled) { background: #f8fafc; border-color: #cbd5e1; }
+        .btn-next { background: var(--p); color: white; border: none; width: 100%; margin-top: 1rem; display: none; padding: 15px; }
+        .correct { background: var(--s) !important; color: white; border-color: var(--s) !important; }
+        .incorrect { background: var(--e) !important; color: white; border-color: var(--e) !important; }
+        .admin-area { margin-top: 2rem; border-top: 2px dashed #eee; padding-top: 1rem; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .btn-sm { font-size: 0.75rem; background: #f8fafc; padding: 5px 10px; color: #64748b; }
+        .panel { display: none; background: #fafafa; border: 1px solid #eee; padding: 15px; border-radius: 8px; margin-top: 10px; width: 100%; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; margin-bottom: 8px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
+        #msg { text-align: center; margin-top: 15px; font-size: 1.1rem; min-height: 1.5rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div style="display:flex; justify-content:space-between; align-items:center">
+        <h3 style="margin:0; color: #1e293b;">English Quiz</h3>
+        <span id="stat" style="font-size:0.8rem; color:#64748b; font-weight: bold;">Cargando...</span>
+    </div>
+
+    <div class="quiz-card">
+        <h2 id="fraseText" style="margin:0; color: #1e293b;">Cargando frases...</h2>
+    </div>
+
+    <div id="options" class="options-grid"></div>
+    <div id="msg"></div>
+    <button id="nextBtn" class="btn-next">Siguiente Frase →</button>
+
+    <div class="admin-area">
+        <button class="btn-sm" onclick="show('manual')">➕ Añadir</button>
+        <button class="btn-sm" onclick="show('json')">📂 Importar JSON</button>
+        <button class="btn-sm" onclick="if(confirm('¿Borrar todo y volver al inicio?')) reset()">🔄 Reset</button>
+    </div>
+
+    <div id="p-manual" class="panel">
+        <input type="text" id="in-f" placeholder="Frase en Inglés">
+        <input type="text" id="in-c" placeholder="Respuesta Correcta">
+        <input type="text" id="in-o1" placeholder="Opción Falsa 1">
+        <input type="text" id="in-o2" placeholder="Opción Falsa 2">
+        <input type="text" id="in-o3" placeholder="Opción Falsa 3">
+        <button onclick="addManual()" style="width:100%; background:var(--s); color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">Guardar Frase</button>
+    </div>
+
+    <div id="p-json" class="panel">
+        <p style="font-size:0.7rem; color: #64748b;">Selecciona un archivo .json para sumar a tu lista actual:</p>
+        <input type="file" id="fileIn" accept=".json">
+    </div>
+</div>
+
+<script>
+    let db = [];
+    let cur = 0;
+
+    // 1. INICIALIZACIÓN
+    async function init() {
+        const local = localStorage.getItem('my_quiz_data');
+        
+        if (local && JSON.parse(local).length > 0) {
+            db = JSON.parse(local);
+            console.log("Datos cargados desde LocalStorage");
+        } else {
+            console.log("Buscando preguntas.json en el servidor...");
+            try {
+                // Usamos './' para asegurar que busque en la misma carpeta que el HTML
+                const res = await fetch('./preguntas.json', { cache: 'no-cache' });
+                if (res.ok) {
+                    db = await res.json();
+                    console.log("JSON cargado con éxito");
+                } else {
+                    throw new Error("No se encontró preguntas.json");
+                }
+            } catch (e) {
+                console.error(e);
+                db = [{
+                    frase: "Welcome! Add your first phrase below", 
+                    opciones: ["Add now", "Later", "Help", "Settings"], 
+                    correcta: 0 
+                }];
+            }
+        }
+        save();
+        render();
+    }
+
+    function save() {
+        localStorage.setItem('my_quiz_data', JSON.stringify(db));
+        document.getElementById('stat').textContent = `Total: ${db.length} frases`;
+    }
+
+    function render() {
+        if (db.length === 0) return;
+        
+        const item = db[cur];
+        const fraseElement = document.getElementById('fraseText');
+        const optBox = document.getElementById('options');
+        const msgElement = document.getElementById('msg');
+        const nextBtn = document.getElementById('nextBtn');
+
+        fraseElement.textContent = item.frase;
+        msgElement.textContent = "";
+        nextBtn.style.display = "none";
+        optBox.innerHTML = "";
+
+        // Guardamos el texto de la respuesta correcta ANTES de mezclar
+        const textoCorrecto = item.opciones[item.correcta];
+
+        // Creamos una copia de las opciones y las mezclamos
+        let opcionesMezcladas = [...item.opciones].sort(() => Math.random() - 0.5);
+
+        opcionesMezcladas.forEach(texto => {
+            const b = document.createElement('button');
+            b.textContent = texto;
+            b.onclick = () => {
+                // Desactivar todos los botones una vez elegido uno
+                document.querySelectorAll('#options button').forEach(btn => btn.disabled = true);
+                
+                if(texto === textoCorrecto) {
+                    b.classList.add('correct');
+                    msgElement.innerHTML = "<span style='color:var(--s)'>¡Correcto! ✨</span>";
+                } else {
+                    b.classList.add('incorrect');
+                    msgElement.innerHTML = "<span style='color:var(--e)'>Casi... ❌</span>";
+                    
+                    // Resaltar la correcta para aprender
+                    document.querySelectorAll('#options button').forEach(btn => {
+                        if(btn.textContent === textoCorrecto) btn.classList.add('correct');
+                    });
+                }
+                nextBtn.style.display = "block";
+            };
+            optBox.appendChild(b);
+        });
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+        cur = (cur + 1) % db.length;
+        render();
+    };
+
+    // --- PANEL DE GESTIÓN ---
+    function show(id) {
+        const p = document.getElementById('p-' + id);
+        const isVisible = p.style.display === 'block';
+        document.querySelectorAll('.panel').forEach(x => x.style.display = 'none');
+        p.style.display = isVisible ? 'none' : 'block';
+    }
+
+    function addManual() {
+        const f = document.getElementById('in-f').value;
+        const c = document.getElementById('in-c').value;
+        const o1 = document.getElementById('in-o1').value || "Option 2";
+        const o2 = document.getElementById('in-o2').value || "Option 3";
+        const o3 = document.getElementById('in-o3').value || "Option 4";
+
+        if(!f || !c) return alert("La frase y la respuesta correcta son obligatorias");
+
+        // Siempre guardamos la correcta en el índice 0, el render la mezclará luego
+        db.push({ frase: f, opciones: [c, o1, o2, o3], correcta: 0 });
+        save();
+        
+        // Limpiar campos
+        document.getElementById('in-f').value = "";
+        document.getElementById('in-c').value = "";
+        show('manual');
+        render();
+        alert("¡Frase añadida con éxito!");
+    }
+
+    document.getElementById('fileIn').onchange = (e) => {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            try {
+                const extra = JSON.parse(ev.target.result);
+                db = db.concat(extra);
+                save();
+                render();
+                alert("JSON importado correctamente");
+                show('json');
+            } catch (err) {
+                alert("Error: El archivo JSON no tiene un formato válido");
+            }
+        };
+        reader.readAsText(e.target.files[0]);
+    };
+
+    function reset() {
+        localStorage.removeItem('my_quiz_data');
+        db = [];
+        location.reload();
+    }
+
+    init();
+</script>
+</body>
+</html>
