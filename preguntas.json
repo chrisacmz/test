@@ -1,0 +1,22 @@
+[
+  { "frase": "The weather is beautiful today", "opciones": ["El clima está hermoso hoy", "Hace mucho frío", "Mañana lloverá", "El día está oscuro"], "correcta": 0 },
+  { "frase": "I have been waiting for an hour", "opciones": ["He estado esperando por una hora", "Llegué hace una hora", "Esperé diez minutos", "No quiero esperar más"], "correcta": 0 },
+  { "frase": "What do you do for a living?", "opciones": ["¿Dónde vives?", "¿A qué te dedicas?", "¿Qué estás haciendo?", "¿Cómo te ganas la vida?"], "correcta": 1 },
+  { "frase": "I'm looking forward to seeing you", "opciones": ["Tengo miedo de verte", "No quiero verte", "Tengo muchas ganas de verte", "Te veré mañana"], "correcta": 2 },
+  { "frase": "Can you lend me a hand?", "opciones": ["¿Me puedes prestar tu mano?", "¿Puedes lavarte las manos?", "¿Me puedes echar una mano?", "¿Tienes una mano?"], "correcta": 2 },
+  { "frase": "It's not worth the effort", "opciones": ["No vale la pena el esfuerzo", "El esfuerzo es importante", "Vale mucho dinero", "No tengo fuerzas"], "correcta": 0 },
+  { "frase": "I've changed my mind", "opciones": ["He cambiado mi ropa", "He cambiado de opinión", "He perdido la razón", "Me duele la cabeza"], "correcta": 1 },
+  { "frase": "Make yourself at home", "opciones": ["Haz tu casa", "Vete a tu casa", "Siéntete como en tu casa", "Limpia la casa"], "correcta": 2 },
+  { "frase": "Better late than never", "opciones": ["Más vale tarde que nunca", "Es mejor llegar tarde", "Nunca llegues tarde", "Tarde o temprano"], "correcta": 0 },
+  { "frase": "I'll let you know", "opciones": ["Te dejaré ir", "Te lo haré saber", "Ya lo sé", "No te conozco"], "correcta": 1 },
+  { "frase": "It depends on the context", "opciones": ["Depende del contexto", "Es un contexto difícil", "No entiendo el contexto", "El contexto importa poco"], "correcta": 0 },
+  { "frase": "Keep in touch", "opciones": ["Mantente en contacto", "Toca la puerta", "Sigue intentando", "No me toques"], "correcta": 0 },
+  { "frase": "That sounds great", "opciones": ["Eso suena mal", "Eso suena genial", "Escucha eso", "Es muy ruidoso"], "correcta": 1 },
+  { "frase": "I'm running out of time", "opciones": ["Estoy corriendo a tiempo", "Se me está acabando el tiempo", "Tengo mucho tiempo", "El tiempo vuela"], "correcta": 1 },
+  { "frase": "Never mind", "opciones": ["No me importa", "No importa (olvídalo)", "Ten cuidado", "Nunca digas nunca"], "correcta": 1 },
+  { "frase": "I don't agree with you", "opciones": ["No estoy de acuerdo contigo", "No te entiendo", "No me gustas", "Estoy de acuerdo"], "correcta": 0 },
+  { "frase": "As far as I know", "opciones": ["Hasta donde yo sé", "Sé muy poco", "Tan lejos como sé", "No sé nada"], "correcta": 0 },
+  { "frase": "Could you speak more slowly?", "opciones": ["¿Puedes hablar más rápido?", "¿Puedes hablar más bajo?", "¿Podrías hablar más despacio?", "¿Qué dijiste?"], "correcta": 2 },
+  { "frase": "I'm in a hurry", "opciones": ["Estoy feliz", "Tengo prisa", "Estoy preocupado", "Tengo hambre"], "correcta": 1 },
+  { "frase": "Let's call it a day", "opciones": ["Llamemos al día", "Dejémoslo por hoy", "Es un gran día", "Mañana será otro día"], "correcta": 1 }
+]
